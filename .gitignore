@@ -1,0 +1,18 @@
+wjcat/DS_Store
+wjcat/node_modules/
+wjcat/dist/
+wjcat/npm-debug.log*
+wjcat/yarn-debug.log*
+wjcat/yarn-error.log*
+
+# Editor directories and files
+wjcat/.idea
+wjcat/.vscode
+wjcat/*.suo
+wjcat/*.ntvs*
+wjcat/*.njsproj
+wjcat/*.sln
+
+wjcatAdmin/.idea
+
+.idea
