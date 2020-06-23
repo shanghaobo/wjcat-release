@@ -16,3 +16,5 @@ wjcat/*.sln
 wjcatAdmin/.idea
 
 .idea
+
+wjcatAdmin/wjcatAdmin/settings.py

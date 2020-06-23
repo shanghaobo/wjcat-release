@@ -50,7 +50,8 @@ class Answer(models.Model):
     submitId=models.IntegerField(verbose_name='关联提交id')
     wjId=models.IntegerField(verbose_name='问卷id')
     type = models.CharField(max_length=20, verbose_name='题目类型')
-    answer=models.TextField(verbose_name='答案')
+    answer=models.IntegerField(verbose_name='答案')
+    answerText = models.TextField(verbose_name='文本答案')
 
 
 

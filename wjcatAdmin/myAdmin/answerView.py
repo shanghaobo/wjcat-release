@@ -226,7 +226,7 @@ def submitWj(info,request):
                     submitId=submitInfo.id,
                     wjId=wjId,
                     type=item['type'],
-                    answer=item['textValue']
+                    answerText=item['textValue']
                 )
     else:
         response['code'] = '-3'
