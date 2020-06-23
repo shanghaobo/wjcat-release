@@ -23,3 +23,30 @@ new Vue({
   components: { App },
   template: '<App/>'
 })
+
+
+//百度统计 id替换为自己的
+
+var _hmt = _hmt || [];
+window._hmt=_hmt;
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?9354205e2c5c77a15e07019792243422";
+  var s = document.getElementsByTagName("script")[0];
+  s.parentNode.insertBefore(hm, s);
+})();
+
+router.afterEach( ( to, from, next ) => {
+ setTimeout(()=>{
+   var _hmt = _hmt || [];
+   (function() {
+    //每次执行前，先移除上次插入的代码
+    document.getElementById('baidu_tj') && document.getElementById('baidu_tj').remove();
+    var hm = document.createElement("script");
+    hm.src = "https://hm.baidu.com/hm.js?9354205e2c5c77a15e07019792243422";
+    hm.id = "baidu_tj"
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(hm, s);
+   })();
+ },0);
+} );
