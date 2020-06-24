@@ -1,8 +1,8 @@
 from django.shortcuts import HttpResponse
 import json
 from myAdmin.models import *
-from django.db import transaction
-
+from django.db import transaction,connection
+from django.db.models import Q
 
 ############################################################
 #功能：问卷设计者操作主入口
@@ -55,6 +55,8 @@ def opera(request):
                         response = useTemp(info,username)
                     elif opera_type == 'exit':
                         response = exit(request)
+                    elif opera_type=='get_text_answer_detail':
+                        response=getTextAnswerDetail(info)
                     else:
                         response['code'] = '-7'
                         response['msg'] = '请求类型有误'
@@ -479,16 +481,19 @@ def dataAnalysis(info):
             for question in questions:
                 questionTitle = question.title
                 questionType = question.type
+                questionId=question.id
                 if questionType == "radio" or questionType == "checkbox":
                     result = getQuestionAnalysis(question.id)
                     print(result)
                 else:
-                    result = getQuestionText(question.id)
+                    # result = getQuestionText(question.id)
+                    result=''
 
                 detail.append({
                     "title": questionTitle,
                     "type": questionType,
-                    "result": result
+                    "result": result,
+                    "questionId":questionId
                 })
             response['detail'] = detail
         else:
@@ -547,6 +552,27 @@ def getQuestionText(questionId):
             result.append({'context': item.answerText})
     return result
 
+
+#获取文本回答详情
+def getTextAnswerDetail(info):
+    response = {'code': 0, 'msg': 'success'}
+    questionId=info.get('questionId')
+    pageSize=info.get('pageSize',10)
+    currentPage=info.get('currentPage',1)
+    if not questionId:
+        response['code'] = '-4'
+        response['msg'] = '操作失败'
+        return response
+    answer=Answer.objects.filter(~Q(answerText=''),questionId=questionId,answerText__isnull=False)
+    total=answer.count()
+    answer=answer[(currentPage-1)*pageSize:currentPage*pageSize]
+    result = []
+    for item in answer:
+
+        result.append({'context': item.answerText})
+    response['detail']=result
+    response['total']=total
+    return response
 
 
 

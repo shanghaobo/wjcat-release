@@ -18,4 +18,4 @@ wjcatAdmin/.idea
 .idea
 
 wjcatAdmin/wjcatAdmin/settings.py
-wjcatAdmin/wjcatAdmin/dist
+wjcatAdmin/myAdmin/dist*
