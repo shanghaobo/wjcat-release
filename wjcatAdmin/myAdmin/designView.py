@@ -3,6 +3,10 @@ import json
 from myAdmin.models import *
 from django.db import transaction,connection
 from django.db.models import Q
+from . import handle
+from io import BytesIO
+import base64
+
 
 ############################################################
 #功能：问卷设计者操作主入口
@@ -57,6 +61,8 @@ def opera(request):
                         response = exit(request)
                     elif opera_type=='get_text_answer_detail':
                         response=getTextAnswerDetail(info)
+                    elif opera_type=='analysis_export_excel':
+                        response=analysisExportExcel(info)
                     else:
                         response['code'] = '-7'
                         response['msg'] = '请求类型有误'
@@ -668,3 +674,27 @@ def useTemp(info,username):
         response['msg'] = '确少必要参数'
 
     return response
+
+
+# 导出excel
+def analysisExportExcel(info):
+    response = {'code': 0, 'msg': 'success'}
+    wjId=info.get('wjId')
+    if not wjId:
+        response['code'] = '-3'
+        response['msg'] = '确少必要参数'
+        return response
+    wj=Wj.objects.get(id=wjId)
+    title=wj.title
+    data=dataAnalysis(info)
+    if data['code']==0:
+        detail=data['detail']
+        wb=handle.analysisExportExcel(detail,title)
+        bio = BytesIO()
+        wb.save(bio)
+        bio.seek(0)
+        response['filename']='%s.xls'%title
+        response['b64data']=base64.b64encode(bio.getvalue()).decode()
+        return response
+    else:
+        return response

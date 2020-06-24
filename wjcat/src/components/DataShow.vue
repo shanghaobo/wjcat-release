@@ -3,7 +3,24 @@
 功能：对问卷调查结果的数据进行分析并用图表可视化展示
 -->
 <template>
-  <div class="Count" v-loading="loading" element-loading-text="生成中...">
+  <div
+    id="pdfDom"
+    class="Count"
+    v-loading="loading"
+    element-loading-text="生成中..."
+  >
+    <div v-if="!(detail.length == 0)" class="opera-buttons">
+      <el-button
+        type="primary"
+        size="mini"
+        @click.native="analysisExportExcel"
+        :loading="exportExcelLoading"
+        >导出excel</el-button
+      >
+      <el-button type="success" size="mini" @click.native="exportPdf"
+        >导出PDF</el-button
+      >
+    </div>
     <div v-if="detail.length == 0">暂时没有数据</div>
     <el-card class="question" v-for="(item, index) in detail">
       <div slot="header" class="clearfix">
@@ -12,34 +29,60 @@
       <!--如果数据库中的问题类型为单项选择或者多项选择-->
       <!--则将数据库中的数据以表格、柱状图、饼状图、圆环图、条形图的方式进行展示-->
       <div v-if="item.type == 'radio' || item.type == 'checkbox'">
-        <el-table :data="item.result" style="width: 100%" stripe class="table">
-          <el-table-column
-            prop="option"
-            label="选项"
-            width="180"
-          ></el-table-column>
+        <el-table
+          size="small"
+          :data="item.result"
+          style="width: 100%"
+          stripe
+          class="table"
+        >
+          <el-table-column prop="option" label="选项"></el-table-column>
           <el-table-column
             prop="count"
             label="数量"
             width="180"
           ></el-table-column>
-          <el-table-column prop="percent" label="占比"></el-table-column>
+          <el-table-column
+            prop="percent"
+            label="占比"
+            width="180"
+          ></el-table-column>
         </el-table>
         <br />
 
-        <el-button type="primary" plain @click.native="changeValue(index, 1)"
+        <el-button
+          size="mini"
+          type="primary"
+          plain
+          @click.native="changeValue(index, 1)"
           >柱状图</el-button
         >
-        <el-button type="primary" plain @click.native="changeValue(index, 2)"
+        <el-button
+          size="mini"
+          type="primary"
+          plain
+          @click.native="changeValue(index, 2)"
           >饼状图</el-button
         >
-        <el-button type="primary" plain @click.native="changeValue(index, 3)"
+        <el-button
+          size="mini"
+          type="primary"
+          plain
+          @click.native="changeValue(index, 3)"
           >圆环图</el-button
         >
-        <el-button type="primary" plain @click.native="changeValue(index, 4)"
+        <el-button
+          size="mini"
+          type="primary"
+          plain
+          @click.native="changeValue(index, 4)"
           >条形图</el-button
         >
-        <el-button type="primary" plain @click.native="changeValue(index, 0)"
+        <el-button
+          size="mini"
+          type="primary"
+          plain
+          @click.native="changeValue(index, 0)"
           >隐藏图表</el-button
         >
 
@@ -59,6 +102,7 @@
       <!--如果数据库中的问题类型为text类型则将数据以弹窗表格的形式进行显示-->
       <div v-if="item.type == 'text'">
         <el-button
+          size="mini"
           type="primary"
           plain
           @click.native="lookTextDetail(item.questionId)"
@@ -87,6 +131,8 @@
 import echarts from "echarts";
 import { designOpera } from "./api";
 import Design from "./Design.vue";
+import axios from "axios";
+
 export default {
   data() {
     return {
@@ -98,7 +144,9 @@ export default {
       pageSize: 10,
       total: 0,
       tableData: [],
-      questionId: 0
+      questionId: 0,
+      wjId: 0,
+      exportExcelLoading: false
     };
   },
   mounted() {
@@ -106,6 +154,50 @@ export default {
     //      console.log(this.visible);
   },
   methods: {
+    // 导出pdf
+    exportPdf() {
+      this.$alert("正在开发...", "提示");
+    },
+    // 导出excel
+    analysisExportExcel() {
+      this.exportExcelLoading = true;
+      designOpera({
+        opera_type: "analysis_export_excel",
+        wjId: this.wjId
+      }).then(data => {
+        this.doDownload(data.b64data, data.filename, "excel");
+        this.exportExcelLoading = false;
+      });
+    },
+    doDownload(data, filename, type) {
+      var b64data = data; //base64数据
+      // b64data = b64data.replace("data:" + type + ";base64,", "");
+      var bdata = this.dataURLtoBlob(b64data);
+      if (!b64data) {
+        return;
+      }
+      let url = window.URL.createObjectURL(new Blob([bdata]));
+      let link = document.createElement("a");
+      link.style.display = "none";
+      link.href = url;
+      //        link.download = 'ea7c0cf24153e0cd62bc8b64841fd84d.jpg'; //下载后文件名
+      link.setAttribute("download", filename);
+
+      document.body.appendChild(link);
+      link.click();
+    },
+    dataURLtoBlob(dataurl) {
+      //          dataurl=dataurl.replace('data:application/json;base64,','')
+      console.log(dataurl);
+      var bstr = atob(dataurl),
+        n = bstr.length,
+        u8arr = new Uint8Array(n);
+      while (n--) {
+        u8arr[n] = bstr.charCodeAt(n);
+      }
+      return u8arr;
+    },
+    // 获取表格数据
     getTableData() {
       designOpera({
         opera_type: "get_text_answer_detail",
@@ -155,6 +247,7 @@ export default {
       this.detail = [];
       console.log("wjid===");
       console.log(this.wjId);
+      this.wjId = id;
       designOpera({
         opera_type: "dataAnalysis",
         username: "test",
@@ -330,7 +423,7 @@ export default {
   max-width: 800px;
   width: 80%;
   display: inline-block;
-  margin: 10px;
+  margin: 5px;
   text-align: left;
 }
 .Count .table {
@@ -350,5 +443,8 @@ export default {
 .Count .tz {
   width: 500px;
   height: 300px;
+}
+.opera-buttons {
+  padding: 10px;
 }
 </style>
