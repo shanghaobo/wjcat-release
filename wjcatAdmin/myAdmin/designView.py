@@ -63,6 +63,8 @@ def opera(request):
                         response=getTextAnswerDetail(info)
                     elif opera_type=='analysis_export_excel':
                         response=analysisExportExcel(info)
+                    elif opera_type=='answer_text_to_excel':
+                        response=answerText2Excel(info)
                     else:
                         response['code'] = '-7'
                         response['msg'] = '请求类型有误'
@@ -698,3 +700,31 @@ def analysisExportExcel(info):
         return response
     else:
         return response
+
+#回答文本导出excel
+def answerText2Excel(info):
+    response = {'code': 0, 'msg': 'success'}
+    questionId=info.get('questionId')
+    if not questionId:
+        response['code'] = '-3'
+        response['msg'] = '确少必要参数'
+        return response
+    try:
+        q = Question.objects.get(id=questionId)
+    except:
+        response['code']='-4'
+        response['code']='操作失败'
+        return response
+    else:
+        title=q.title
+    answer = Answer.objects.filter(~Q(answerText=''), questionId=questionId, answerText__isnull=False)
+    data=[]
+    for item in answer:
+        data.append(item.answerText)
+    wb=handle.answerText2Excel(data)
+    bio = BytesIO()
+    wb.save(bio)
+    bio.seek(0)
+    response['filename'] = '%s.xls' % title
+    response['b64data'] = base64.b64encode(bio.getvalue()).decode()
+    return response

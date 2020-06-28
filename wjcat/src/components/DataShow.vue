@@ -108,6 +108,14 @@
           @click.native="lookTextDetail(item.questionId)"
           >详细内容</el-button
         >
+        <el-button
+          size="mini"
+          type="primary"
+          plain
+          @click.native="answerText2Excel(item.questionId)"
+          :loading="item.questionId == answerText2ExcelQeustionId"
+          >导出excel</el-button
+        >
       </div>
     </el-card>
     <el-dialog title="详细内容" :visible.sync="dialogTableVisible">
@@ -146,7 +154,8 @@ export default {
       tableData: [],
       questionId: 0,
       wjId: 0,
-      exportExcelLoading: false
+      exportExcelLoading: false,
+      answerText2ExcelQeustionId: 0
     };
   },
   mounted() {
@@ -154,6 +163,16 @@ export default {
     //      console.log(this.visible);
   },
   methods: {
+    answerText2Excel(questionId) {
+      this.answerText2ExcelQeustionId = questionId;
+      designOpera({
+        opera_type: "answer_text_to_excel",
+        questionId: questionId
+      }).then(data => {
+        this.doDownload(data.b64data, data.filename, "excel");
+        this.answerText2ExcelQeustionId = 0;
+      });
+    },
     // 导出pdf
     exportPdf() {
       this.$alert("正在开发...", "提示");
