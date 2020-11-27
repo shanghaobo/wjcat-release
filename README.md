@@ -66,7 +66,7 @@
    2. 在 `wjcat-release\wjcatAdmin` 目录下依次执行 `python manage.py makemigrations` 和 `python manage.py migrate` 命令对数据库进行迁移。若迁移不成功，可以在 `wjcat-release\wjcatAdmin\myAdmin` 目录下面新建一个 `migrations` 目录，而后 `migrations` 目录内新建一个名为 `__init__.py` 的空文件。
 
 2. 进入 wjcat 目录下，在当前目录打开 cmd 控制台，先使用 npm install 安装依赖，输入 npm run dev 启动前端项目。
-3. 进入 wjcatAdmin 目录下，在当前目录打开 cmd 控制台，输入 python manage runserver 启动后端项目。
+3. 进入 wjcatAdmin 目录下，在当前目录打开 cmd 控制台，输入 python manage.py runserver 启动后端项目。
 4. 打开浏览器，输入 http://127.0.0.1:8080 即可访问本系统。
 5. 也可直接在浏览器输入 http://www.wjcat.com 访问部署后的本系统。
 
