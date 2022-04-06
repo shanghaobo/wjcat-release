@@ -1,4 +1,4 @@
-Django==2.1
+Django==2.2.27
 PyMySQL==1.0.2
 pytz==2022.1
 simpleui==4.0.2
