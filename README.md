@@ -73,3 +73,7 @@
 有其他问题可以加入问卷喵交流群：`850804401`
 
 需要docker部署版或协助部署请加QQ：`1186156343`（有偿）
+
+## Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=shanghaobo/wjcat-release&type=Date)](https://star-history.com/#shanghaobo/wjcat-release&Date)
