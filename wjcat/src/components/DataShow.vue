@@ -316,18 +316,22 @@ export default {
     },
     // 饼状图
     setPar(id) {
+      console.log(id);
+      console.log(this.detail[id].result);
       let myChart = echarts.init(document.getElementById("bing" + id));
+
+      var myData = [];
+      let formData = this.detail[id].result;
+      for(let i = 0; i < formData.length; i++) {
+        let element = formData[i];
+        let item = {name: element.option, value: element.count};
+        myData.push(item);
+      }
+
       var option = {
         tooltip: {},
-
+        legend: {},
         color: ["#409EFF", "#FFB54D", "#FF7466", "#44DB5E"],
-        legend: {
-          data: ["数量"]
-        },
-        dataset: {
-          dimensions: ["option", "count", "percent"],
-          source: this.detail[id].result
-        },
         series: [
           {
             name: "统计结果：",
@@ -340,7 +344,8 @@ export default {
                 shadowOffsetX: 0,
                 shadowColor: "rgba(0, 0, 0, 0.5)"
               }
-            }
+            },
+            data: myData
           }
         ]
       };
@@ -350,20 +355,26 @@ export default {
     setRing(id) {
       //console.log(id);
       let myChart = echarts.init(document.getElementById("ring" + id));
+
+      var myData = [];
+      let formData = this.detail[id].result;
+      for(let i = 0; i < formData.length; i++) {
+        let element = formData[i];
+        let item = {name: element.option, value: element.count};
+        myData.push(item);
+      }
+
       var option = {
         tooltip: {},
         legend: {},
         color: ["#409EFF", "#FFB54D", "#FF7466", "#44DB5E"],
-        dataset: {
-          dimensions: ["option", "count", "percent"],
-          source: this.detail[id].result
-        },
         series: [
           {
             name: "数量：",
             type: "pie",
             radius: ["50%", "70%"],
             avoidLabelOverlap: false,
+            data: myData,
             label: {
               normal: {
                 show: false,
@@ -387,7 +398,7 @@ export default {
       };
       myChart.setOption(option);
     },
-    //圆环图
+    //条状图
     setTz(id) {
       //console.log(id);
       let myChart = echarts.init(document.getElementById("tz" + id));
