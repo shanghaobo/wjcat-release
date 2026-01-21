@@ -19,3 +19,5 @@ wjcatAdmin/.idea
 
 wjcatAdmin/wjcatAdmin/settings.py
 wjcatAdmin/myAdmin/dist*
+**/__pycache__/
+wjcatAdmin/venv/

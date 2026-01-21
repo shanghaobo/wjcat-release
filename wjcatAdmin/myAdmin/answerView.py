@@ -20,9 +20,11 @@ def opera(request):
         print(body)
         try:
             info = json.loads(body)#解析json报文
-        except:
+        except Exception as e:
             response['code'] = '-2'
             response['msg'] = '请求格式有误'
+            response['error_type'] = str(type(e).__name__)
+            response['error_detail'] = str(e)
         opera_type=info.get('opera_type')#获取操作类型
         if opera_type:
             if opera_type=='get_info':#获取问卷信息
@@ -57,9 +59,11 @@ def getInfo(info,request):
             res=Wj.objects.get(id=wjId)#查询id为wjId
             response['title']=res.title
             response['desc']=res.desc
-        except:
+        except Exception as e:
             response['code'] = '-10'
             response['msg'] = '问卷不存在'
+            response['error_type'] = str(type(e).__name__)
+            response['error_detail'] = str(e)
         else:
             if res.username==username or res.status==1:#只有问卷发布者或者此问卷为已发布才能查看
                 obj = Question.objects.filter(wjId=wjId)
@@ -159,9 +163,11 @@ def submitWj(info,request):
             res = Wj.objects.get(id=wjId)  # 查询id为wjId
             response['title'] = res.title
             response['desc'] = res.desc
-        except:
+        except Exception as e:
             response['code'] = '-10'
             response['msg'] = '问卷不存在'
+            response['error_type'] = str(type(e).__name__)
+            response['error_detail'] = str(e)
             return response
         if res.status==0:#当问卷状态为1(已发布)时才可回答
             response['code'] = '-10'

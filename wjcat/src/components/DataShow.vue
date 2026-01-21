@@ -20,6 +20,13 @@
       <el-button type="success" size="mini" @click.native="exportPdf"
         >导出PDF</el-button
       >
+      <el-button
+        type="primary"
+        size="mini"
+        @click.native="exportRawData"
+        :loading="rawDataLoading"
+        >导出原始数据</el-button
+      >
     </div>
     <div v-if="detail.length == 0">暂时没有数据</div>
     <el-card class="question" v-for="(item, index) in detail">
@@ -155,6 +162,7 @@ export default {
       questionId: 0,
       wjId: 0,
       exportExcelLoading: false,
+      rawDataLoading: false,
       answerText2ExcelQeustionId: 0
     };
   },
@@ -171,6 +179,19 @@ export default {
       }).then(data => {
         this.doDownload(data.b64data, data.filename, "excel");
         this.answerText2ExcelQeustionId = 0;
+      });
+    },
+    exportRawData() {
+      this.rawDataLoading = true;
+      designOpera({
+        opera_type: "exportRawData",
+        wjId: this.wjId
+      }).then(data => {
+        this.doDownload(data.b64data, data.filename, "excel");
+        this.rawDataLoading = false;
+      }).catch(() => {
+        this.rawDataLoading = false;
+        this.$message.error('请求失败');
       });
     },
     // 导出pdf
@@ -467,3 +488,4 @@ export default {
   padding: 10px;
 }
 </style>
+

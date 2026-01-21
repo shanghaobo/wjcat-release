@@ -19,9 +19,11 @@ def opera(request):
         print(body)
         try:
             info = json.loads(body)#解析json报文
-        except:
+        except Exception as e:
             response['code'] = '-2'
             response['msg'] = '请求格式有误'
+            response['error_type'] = str(type(e).__name__)
+            response['error_detail'] = str(e)
         else:
             opera_type = info.get('opera_type')  # 获取操作类型
             username = request.session.get('username')
@@ -65,6 +67,8 @@ def opera(request):
                         response=analysisExportExcel(info)
                     elif opera_type=='answer_text_to_excel':
                         response=answerText2Excel(info)
+                    elif opera_type=='exportRawData':
+                        response=exportRawData(info)
                     else:
                         response['code'] = '-7'
                         response['msg'] = '请求类型有误'
@@ -679,6 +683,26 @@ def useTemp(info,username):
 
 
 # 导出excel
+def exportRawData(info):
+    response = {'code': 0, 'msg': 'success'}
+    wjId = info.get('wjId')
+    if not wjId:
+        response['code'] = '-3'
+        response['msg'] = '缺少必要参数'
+        return response
+    try:
+        wb = handle.exportWjDataToExcel(wjId)
+        bio = BytesIO()
+        wb.save(bio)
+        bio.seek(0)
+        response['filename'] = Wj.objects.get(id=wjId).title + '_原始数据.xls'
+        response['b64data'] = base64.b64encode(bio.getvalue()).decode()
+    except Exception as e:
+        response['code'] = '-10'
+        response['msg'] = str(e)
+    return response
+
+
 def analysisExportExcel(info):
     response = {'code': 0, 'msg': 'success'}
     wjId=info.get('wjId')

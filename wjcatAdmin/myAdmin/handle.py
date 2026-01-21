@@ -1,5 +1,6 @@
 import xlwt
 import json
+from myAdmin.models import Submit, Question, Answer, Options
 
 
 #回答数据导出excel
@@ -44,6 +45,53 @@ def analysisExportExcel(data,title='问卷统计'):
     return wb
 
 
+def exportWjDataToExcel(wjId):
+    # 获取问卷所有提交
+    submits = Submit.objects.filter(wjId=wjId)
+    # 获取所有问题
+    questions = Question.objects.filter(wjId=wjId).order_by('id')
+    
+    wb = xlwt.Workbook()
+    ws = wb.add_sheet('问卷数据')
+    
+    # 写表头
+    headers = ['提交时间', '填写用时'] + [q.title for q in questions]
+    for col, header in enumerate(headers):
+        ws.write(0, col, header)
+    
+    # 写数据行
+    for row, submit in enumerate(submits, 1):
+        answers = Answer.objects.filter(submitId=submit.id)
+        answer_dict = {a.questionId: a for a in answers}
+        
+        ws.write(row, 0, submit.submitTime.strftime('%Y-%m-%d %H:%M:%S'))
+        ws.write(row, 1, submit.useTime)
+        
+        for col, question in enumerate(questions, 2):
+            answer = answer_dict.get(question.id)
+            if not answer:
+                continue
+            
+            if question.type == 'checkbox':
+                # 获取该问题的所有答案
+                question_answers = answers.filter(questionId=question.id)
+                # 合并多选题的多个选项
+                option_titles = []
+                for ans in question_answers:
+                    option = Options.objects.get(id=ans.answer)
+                    option_titles.append(option.title)
+                cell_value = ';'.join(option_titles)
+            elif question.type == 'radio':
+                option = Options.objects.get(id=answer.answer)
+                cell_value = option.title
+            else:
+                cell_value = answer.answerText
+            
+            ws.write(row, col, cell_value)
+    
+    return wb
+
+
 def answerText2Excel(data):
     wb = xlwt.Workbook()
     ws = wb.add_sheet('回答详情')
@@ -61,4 +109,5 @@ if __name__=="__main__":
     pass
     # data=json.loads(data)
     # analysisExportExcel(data['detail'])
+
 
